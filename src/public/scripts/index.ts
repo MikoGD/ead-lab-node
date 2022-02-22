@@ -53,8 +53,6 @@ function getCountriesData() {
   xhttp.onload = function () {
     const countriesData: Countries = JSON.parse(this.response);
     if (countriesData) {
-      // // @ts-ignore
-      // delete countriesData.flag_base64;
       const headers = Object.keys(countriesData).map((header) => header);
       const rows = [];
 
