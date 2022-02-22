@@ -1,17 +1,22 @@
-interface Countries {
-  [country: string]: string[];
-  continent: string[];
-  currency_code: string[];
-  city: string[];
-  tld: string[];
-  flag_base64: string[];
+interface Country {
+  [key: string]: string | undefined;
+  coutntry: string;
+  continent?: string | undefined;
+  currency_code?: string | undefined;
+  city?: string | undefined;
+  tld?: string | undefined;
+  flag_base64?: string | undefined;
 }
 
-function createTable(headers: string[], rows: string[][]) {
+function createTable(
+  headers: string[],
+  rows: Record<string, Record<string, any>>
+) {
   const table = $('<table>', {
     class: 'table overflow-scroll',
     id: 'countryTable',
   });
+
   const header = $('<thead>');
   const headerRow = header.append('<tr>');
   headers.forEach((headerString) => {
@@ -22,25 +27,33 @@ function createTable(headers: string[], rows: string[][]) {
   table.append(headerRow);
   const tableBody = $('<tbody>');
 
-  rows.forEach((row) => {
-    const currRow = $('<tr>');
+  Object.values(rows).every((row, rowIndex) => {
+    if (rowIndex > 20) {
+      return false;
+    }
 
-    row.forEach((cellData, index, arr) => {
+    const currRow = $('<tr>');
+    headers.forEach((currHeader, headerIndex, headersArr) => {
       let cell;
-      if (index === arr.length - 1) {
+
+      if (headerIndex === headersArr.length - 1) {
         cell = $('<td>');
         const flag = $('<img>', {
-          src: cellData,
+          src: row[currHeader],
         });
         flag.height('5rem');
         flag.width('100%');
         cell.append(flag);
       } else {
-        cell = $('<td>').text(cellData);
+        cell = $('<td>').text(row[currHeader]);
       }
+
       currRow.append(cell);
     });
+
     tableBody.append(currRow);
+
+    return true;
   });
 
   table.append(tableBody);
@@ -51,17 +64,14 @@ function createTable(headers: string[], rows: string[][]) {
 function getCountriesData() {
   const xhttp = new XMLHttpRequest();
   xhttp.onload = function () {
-    const countriesData: Countries = JSON.parse(this.response);
+    const countriesData: Record<string, Country> = JSON.parse(this.response);
+
     if (countriesData) {
-      const headers = Object.keys(countriesData).map((header) => header);
-      const rows = [];
+      const headers = Object.keys(Object.values(countriesData)[0]).map(
+        (header) => header
+      );
 
-      for (let i = 0; i < countriesData.country.length; i += 1) {
-        const currRow = headers.map((header) => countriesData[header][i]);
-        rows.push(currRow);
-      }
-
-      createTable(headers, rows);
+      createTable(headers, countriesData);
     }
   };
 

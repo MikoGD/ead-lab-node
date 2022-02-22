@@ -3,23 +3,17 @@ import fs from 'fs/promises';
 import url from 'url';
 import path from 'path';
 
-interface Countries {
-  [country: string]: string[];
-  continent: string[];
-  currency_code: string[];
-  city: string[];
-  tld: string[];
-  flag_base64: string[];
+interface Country {
+  [key: string]: string | undefined;
+  coutntry: string;
+  continent?: string | undefined;
+  currency_code?: string | undefined;
+  city?: string | undefined;
+  tld?: string | undefined;
+  flag_base64?: string | undefined;
 }
 
-const countriesData: Countries = {
-  country: [],
-  continent: [],
-  currency_code: [],
-  city: [],
-  tld: [],
-  flag_base64: [],
-};
+let countriesData: Record<string, Country> = {};
 
 function handleError(err: string, res: ServerResponse) {
   res.write(err);
@@ -47,10 +41,12 @@ async function sendFile(filePath: string, res: ServerResponse) {
 }
 
 async function sendCountriesData(res: ServerResponse) {
-  if (countriesData.continent.length > 0) {
+  if (Object.keys(countriesData).length > 0) {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
     res.write(JSON.stringify(countriesData));
     res.end();
   } else {
+    const startTime = performance.now();
     const names = await fs.readFile(
       path.join(__dirname, 'country-objects/country-by-name.json')
     );
@@ -84,11 +80,27 @@ async function sendCountriesData(res: ServerResponse) {
       flag,
     ]);
 
-    const parsedData = rawData.map((currData) => JSON.parse(String(currData)));
+    const readingTime = performance.now();
 
-    Object.keys(countriesData).forEach((key, index) => {
-      countriesData[key] = parsedData[index].map((obj: any) => obj[key]);
+    const parsedData: Record<string, any>[][] = rawData.map((currData) =>
+      JSON.parse(String(currData))
+    );
+
+    const temp: Record<string, Country> = {};
+
+    parsedData.forEach((dataArr) => {
+      dataArr.forEach((elem) => {
+        temp[elem.country] = { ...(temp[elem.country] ?? {}), ...elem };
+      });
     });
+
+    countriesData = temp;
+
+    const parsingTime = performance.now();
+
+    console.log(`Time to read files: ${readingTime - startTime}`);
+    console.log(`Time to parse data: ${parsingTime - readingTime}`);
+    console.log(`Total elapsed time: ${parsingTime - startTime}`);
 
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.write(JSON.stringify(countriesData));
