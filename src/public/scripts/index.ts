@@ -40,9 +40,8 @@ function createTable(
         cell = $('<td>');
         const flag = $('<img>', {
           src: row[currHeader],
+          class: 'flag',
         });
-        flag.height('5rem');
-        flag.width('100%');
         cell.append(flag);
       } else {
         cell = $('<td>').text(row[currHeader]);
