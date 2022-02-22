@@ -9,46 +9,39 @@ interface Country {
 }
 
 let currentRowCount = 0;
-let cachedHeaders: string[] = [];
-let cachedCountriesData: Record<string, Country> = {};
+let headers: string[] = [];
+let currentRows: Country[] = [];
+let totalRows: Country[] = [];
 
 function addRow() {
-  Object.values(cachedCountriesData)
-    .splice(currentRowCount)
-    .every((row, rowIndex) => {
-      if (rowIndex > 20) {
-        currentRowCount += 20;
-        return false;
+  const nextRows = totalRows.splice(currentRowCount, 20);
+
+  currentRows = [...currentRows, ...nextRows];
+
+  nextRows.forEach((row) => {
+    const currRow = $('<tr>');
+    headers.forEach((currHeader, headerIndex, headersArr) => {
+      let cell;
+
+      if (headerIndex === headersArr.length - 1) {
+        cell = $('<td>');
+        const flag = $('<img>', {
+          src: row[currHeader],
+          class: 'flag',
+        });
+        cell.append(flag);
+      } else {
+        cell = $('<td>').text(row[currHeader] ?? '&nbsp;');
       }
 
-      const currRow = $('<tr>');
-      cachedHeaders.forEach((currHeader, headerIndex, headersArr) => {
-        let cell;
-
-        if (headerIndex === headersArr.length - 1) {
-          cell = $('<td>');
-          const flag = $('<img>', {
-            src: row[currHeader],
-            class: 'flag',
-          });
-          cell.append(flag);
-        } else {
-          cell = $('<td>').text(row[currHeader] ?? '&nbsp;');
-        }
-
-        currRow.append(cell);
-      });
-
-      $('#tableBody').append(currRow);
-
-      return true;
+      currRow.append(cell);
     });
+
+    $('#tableBody').append(currRow);
+  });
 }
 
-function createTable(
-  headers: string[],
-  rows: Record<string, Record<string, any>>
-) {
+function createTable() {
   const table = $('<table>', {
     class: 'table overflow-scroll',
     id: 'countryTable',
@@ -64,7 +57,7 @@ function createTable(
   table.append(headerRow);
   const tableBody = $('<tbody>', { id: 'tableBody' });
 
-  Object.values(rows).every((row, rowIndex) => {
+  totalRows.every((row, rowIndex) => {
     if (rowIndex > 20) {
       currentRowCount += 20;
       return false;
@@ -82,7 +75,7 @@ function createTable(
         });
         cell.append(flag);
       } else {
-        cell = $('<td>').text(row[currHeader]);
+        cell = $('<td>').text(row[currHeader] ?? '');
       }
 
       currRow.append(cell);
@@ -102,7 +95,8 @@ function createTable(
   tableContainer.on('scroll', (event) => {
     if (
       event.target.offsetHeight + event.target.scrollTop >=
-      event.target.scrollHeight - event.target.scrollHeight * 0.2
+        event.target.scrollHeight - event.target.scrollHeight * 0.2 &&
+      currentRowCount <= totalRows.length
     ) {
       addRow();
     }
@@ -113,14 +107,18 @@ function getCountriesData() {
   const xhttp = new XMLHttpRequest();
   const start = performance.now();
   xhttp.onload = function () {
-    cachedCountriesData = JSON.parse(this.response);
+    const countriesData: Record<string, Country> = JSON.parse(this.response);
 
-    if (cachedCountriesData) {
-      cachedHeaders = Object.keys(Object.values(cachedCountriesData)[0]).map(
+    if (countriesData) {
+      headers = Object.keys(Object.values(countriesData)[0]).map(
         (header) => header
       );
 
-      createTable(cachedHeaders, cachedCountriesData);
+      totalRows = Object.values(countriesData);
+
+      currentRows = [...currentRows, ...totalRows.slice(currentRowCount, 20)];
+
+      createTable();
       const end = performance.now();
       console.log(`Time to render table: ${end - start}`);
     }
