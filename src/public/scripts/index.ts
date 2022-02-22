@@ -8,6 +8,43 @@ interface Country {
   flag_base64?: string | undefined;
 }
 
+let currentRowCount = 0;
+let cachedHeaders: string[] = [];
+let cachedCountriesData: Record<string, Country> = {};
+
+function addRow() {
+  Object.values(cachedCountriesData)
+    .splice(currentRowCount)
+    .every((row, rowIndex) => {
+      if (rowIndex > 20) {
+        currentRowCount += 20;
+        return false;
+      }
+
+      const currRow = $('<tr>');
+      cachedHeaders.forEach((currHeader, headerIndex, headersArr) => {
+        let cell;
+
+        if (headerIndex === headersArr.length - 1) {
+          cell = $('<td>');
+          const flag = $('<img>', {
+            src: row[currHeader],
+            class: 'flag',
+          });
+          cell.append(flag);
+        } else {
+          cell = $('<td>').text(row[currHeader] ?? '&nbsp;');
+        }
+
+        currRow.append(cell);
+      });
+
+      $('#tableBody').append(currRow);
+
+      return true;
+    });
+}
+
 function createTable(
   headers: string[],
   rows: Record<string, Record<string, any>>
@@ -25,10 +62,11 @@ function createTable(
   });
 
   table.append(headerRow);
-  const tableBody = $('<tbody>');
+  const tableBody = $('<tbody>', { id: 'tableBody' });
 
   Object.values(rows).every((row, rowIndex) => {
     if (rowIndex > 20) {
+      currentRowCount += 20;
       return false;
     }
 
@@ -57,20 +95,34 @@ function createTable(
 
   table.append(tableBody);
 
-  $('#tableContainer').append(table);
+  const tableContainer = $('#tableContainer');
+
+  tableContainer.append(table);
+
+  tableContainer.on('scroll', (event) => {
+    if (
+      event.target.offsetHeight + event.target.scrollTop >=
+      event.target.scrollHeight - event.target.scrollHeight * 0.2
+    ) {
+      addRow();
+    }
+  });
 }
 
 function getCountriesData() {
   const xhttp = new XMLHttpRequest();
+  const start = performance.now();
   xhttp.onload = function () {
-    const countriesData: Record<string, Country> = JSON.parse(this.response);
+    cachedCountriesData = JSON.parse(this.response);
 
-    if (countriesData) {
-      const headers = Object.keys(Object.values(countriesData)[0]).map(
+    if (cachedCountriesData) {
+      cachedHeaders = Object.keys(Object.values(cachedCountriesData)[0]).map(
         (header) => header
       );
 
-      createTable(headers, countriesData);
+      createTable(cachedHeaders, cachedCountriesData);
+      const end = performance.now();
+      console.log(`Time to render table: ${end - start}`);
     }
   };
 
