@@ -169,9 +169,8 @@ function getCountriesData() {
   xhttp.send();
 }
 
-$('#dataButton').on('click', () => {
-  console.log('button clicked');
-
+$('#dataButton').on('click', (event) => {
+  event.target.setAttribute('disabled', 'true');
   $('.spinner-border').removeClass('invisible');
 
   setTimeout(() => {
