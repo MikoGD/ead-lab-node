@@ -83,7 +83,11 @@ function createTable() {
 
   const tableContainer = $('#tableContainer');
 
+  table.hide();
+
   tableContainer.append(table);
+
+  table.fadeIn();
 
   tableContainer.on('scroll', (event) => {
     const { offsetHeight, scrollTop, scrollHeight } = event.target;
@@ -139,5 +143,6 @@ $('#dataButton').on('click', () => {
   setTimeout(() => {
     getCountriesData();
     $('.spinner-border').remove();
+    $('p').text('Folder has been read');
   }, 5000);
 });
