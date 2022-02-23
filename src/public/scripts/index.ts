@@ -73,7 +73,7 @@ function addRow() {
   });
 }
 
-function createTable() {
+function createTable(displayHeaders: string[]) {
   const table = $('<table>', {
     class: 'table overflow-scroll',
     id: 'countryTable',
@@ -81,7 +81,7 @@ function createTable() {
 
   const header = $('<thead>');
   const headerRow = header.append('<tr>');
-  headers.forEach((headerString) => {
+  displayHeaders.forEach((headerString) => {
     const col = $('<th>', { scope: 'col' }).text(headerString);
     headerRow.append(col);
   });
@@ -148,18 +148,31 @@ function getCountriesData() {
 
   xhttp.onload = function () {
     const countriesData: Record<string, Country> = JSON.parse(this.response);
+    const displayHeaders: string[] = [];
 
     if (countriesData) {
-      headers = Object.keys(Object.values(countriesData)[0]).map(
-        (header) => header
-      );
+      headers = Object.keys(Object.values(countriesData)[0]).map((header) => {
+        if (header === 'currency_code') {
+          displayHeaders.push('Currency name');
+        } else if (header === 'tld') {
+          displayHeaders.push('Internet domain');
+        } else if (header === 'flag_base64') {
+          displayHeaders.push('Flag');
+        } else {
+          const displayHeader = header.split('');
+          displayHeader[0] = displayHeader[0].toUpperCase();
+          displayHeaders.push(displayHeader.join(''));
+        }
+
+        return header;
+      });
 
       totalRows = Object.values(countriesData);
 
       currentRows = [...currentRows, ...totalRows.slice(currentRowCount, 20)];
       currentRowCount += 20;
 
-      createTable();
+      createTable(displayHeaders);
       const end = performance.now();
       console.log(`Time to render table: ${end - start}`);
     }
@@ -175,9 +188,10 @@ $('#dataButton').on('click', (event) => {
 
   setTimeout(() => {
     getCountriesData();
-    $('.spinner-border').remove();
-    const paragraph = $('p');
 
+    $('.spinner-border').remove();
+
+    const paragraph = $('p');
     paragraph.fadeIn();
     paragraph.text('Folder has been read!!!');
     paragraph.addClass('display-2 text-center');
