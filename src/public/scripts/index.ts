@@ -27,7 +27,7 @@ function addCellColorChange(elements: JQuery<HTMLElement>) {
   elements.on('click', (event) => {
     const classToRemove = $(event.target).attr('class')?.split(' ').pop();
 
-    if (classToRemove && classToRemove !== 'row-cell') {
+    if (classToRemove && classToRemove.includes('bg')) {
       event.target.classList.remove(classToRemove);
     }
 
@@ -51,7 +51,7 @@ function addRow() {
   nextRows.forEach((row) => {
     const currRow = $('<tr>');
     headers.forEach((currHeader, headerIndex, headersArr) => {
-      const cell = $('<td>', { class: 'row-cell' });
+      const cell = $('<td>', { class: 'row-cell text-center' });
 
       if (headerIndex === headersArr.length - 1) {
         const flag = $('<img>', {
@@ -82,7 +82,9 @@ function createTable(displayHeaders: string[]) {
   const header = $('<thead>');
   const headerRow = header.append('<tr>');
   displayHeaders.forEach((headerString) => {
-    const col = $('<th>', { scope: 'col' }).text(headerString);
+    const col = $('<th>', { scope: 'col', class: 'text-center' }).text(
+      headerString
+    );
     headerRow.append(col);
   });
 
@@ -92,7 +94,7 @@ function createTable(displayHeaders: string[]) {
   currentRows.forEach((row) => {
     const currRow = $('<tr>');
     headers.forEach((currHeader, headerIndex, headersArr) => {
-      const cell = $('<td>', { class: 'row-cell' });
+      const cell = $('<td>', { class: 'row-cell text-center' });
 
       if (headerIndex === headersArr.length - 1) {
         const flag = $('<img>', {
