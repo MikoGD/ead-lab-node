@@ -14,7 +14,7 @@ let currentRows: Country[] = [];
 let totalRows: Country[] = [];
 
 function addRow() {
-  const nextRows = totalRows.splice(currentRowCount, 20);
+  const nextRows = totalRows.slice(currentRowCount, currentRowCount + 20);
 
   currentRows = [...currentRows, ...nextRows];
 
@@ -57,12 +57,7 @@ function createTable() {
   table.append(headerRow);
   const tableBody = $('<tbody>', { id: 'tableBody' });
 
-  totalRows.every((row, rowIndex) => {
-    if (rowIndex > 20) {
-      currentRowCount += 20;
-      return false;
-    }
-
+  currentRows.forEach((row) => {
     const currRow = $('<tr>');
     headers.forEach((currHeader, headerIndex, headersArr) => {
       let cell;
@@ -82,8 +77,6 @@ function createTable() {
     });
 
     tableBody.append(currRow);
-
-    return true;
   });
 
   table.append(tableBody);
@@ -93,12 +86,19 @@ function createTable() {
   tableContainer.append(table);
 
   tableContainer.on('scroll', (event) => {
+    const { offsetHeight, scrollTop, scrollHeight } = event.target;
+    const totalRowsLength = totalRows.length;
+
+    // Check if scroll is 80% down if so more rows if there are more
     if (
-      event.target.offsetHeight + event.target.scrollTop >=
-        event.target.scrollHeight - event.target.scrollHeight * 0.2 &&
-      currentRowCount <= totalRows.length
+      offsetHeight + scrollTop >= scrollHeight - scrollHeight * 0.2 &&
+      currentRowCount < totalRows.length
     ) {
       addRow();
+      currentRowCount =
+        currentRowCount + 20 > totalRowsLength
+          ? totalRowsLength
+          : currentRowCount + 20;
     }
   });
 }
@@ -117,6 +117,7 @@ function getCountriesData() {
       totalRows = Object.values(countriesData);
 
       currentRows = [...currentRows, ...totalRows.slice(currentRowCount, 20)];
+      currentRowCount += 20;
 
       createTable();
       const end = performance.now();
