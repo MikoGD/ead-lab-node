@@ -128,6 +128,9 @@ $('#dataButton').on('click', () => {
     setTimeout(() => {
         getCountriesData();
         $('.spinner-border').remove();
-        $('p').text('Folder has been read');
+        const paragraph = $('p');
+        paragraph.fadeIn();
+        paragraph.text('Folder has been read!!!');
+        paragraph.addClass('display-2 text-center');
     }, 1000);
 });
