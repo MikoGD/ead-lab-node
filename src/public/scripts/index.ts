@@ -8,10 +8,40 @@ interface Country {
   flag_base64?: string | undefined;
 }
 
+const bgColors = [
+  'bg-primary',
+  'bg-secondary',
+  'bg-danger',
+  'bg-success',
+  'bg-warning',
+  'bg-info',
+];
+
 let currentRowCount = 0;
 let headers: string[] = [];
 let currentRows: Country[] = [];
 let totalRows: Country[] = [];
+
+// eslint-disable-next-line no-undef
+function addCellColorChange(elements: JQuery<HTMLElement>) {
+  elements.on('click', (event) => {
+    const classToRemove = $(event.target).attr('class')?.split(' ').pop();
+
+    if (classToRemove && classToRemove !== 'row-cell') {
+      event.target.classList.remove(classToRemove);
+    }
+
+    let colorIndex = Math.floor(Math.random() * bgColors.length);
+    let newClass = bgColors[colorIndex];
+
+    if (newClass === classToRemove) {
+      colorIndex += 1;
+      newClass = bgColors[colorIndex];
+    }
+
+    event.target.classList.add(newClass);
+  });
+}
 
 function addRow() {
   const nextRows = totalRows.slice(currentRowCount, currentRowCount + 20);
@@ -21,20 +51,22 @@ function addRow() {
   nextRows.forEach((row) => {
     const currRow = $('<tr>');
     headers.forEach((currHeader, headerIndex, headersArr) => {
-      let cell;
+      const cell = $('<td>', { class: 'row-cell' });
 
       if (headerIndex === headersArr.length - 1) {
-        cell = $('<td>');
         const flag = $('<img>', {
           src: row[currHeader],
           class: 'flag',
         });
+
         cell.append(flag);
       } else {
-        cell = $('<td>').text(row[currHeader] ?? '&nbsp;');
+        cell.text(row[currHeader] ?? 'N/A');
       }
 
       currRow.append(cell);
+
+      addCellColorChange(currRow.children('td.row-cell'));
     });
 
     $('#tableBody').append(currRow);
@@ -60,17 +92,17 @@ function createTable() {
   currentRows.forEach((row) => {
     const currRow = $('<tr>');
     headers.forEach((currHeader, headerIndex, headersArr) => {
-      let cell;
+      const cell = $('<td>', { class: 'row-cell' });
 
       if (headerIndex === headersArr.length - 1) {
-        cell = $('<td>');
         const flag = $('<img>', {
           src: row[currHeader],
           class: 'flag',
         });
+
         cell.append(flag);
       } else {
-        cell = $('<td>').text(row[currHeader] ?? '');
+        cell.text(row[currHeader] ?? '');
       }
 
       currRow.append(cell);
@@ -87,7 +119,7 @@ function createTable() {
 
   tableContainer.append(table);
 
-  table.fadeIn();
+  addCellColorChange($('.row-cell'));
 
   tableContainer.on('scroll', (event) => {
     const { offsetHeight, scrollTop, scrollHeight } = event.target;
@@ -105,6 +137,8 @@ function createTable() {
           : currentRowCount + 20;
     }
   });
+
+  table.fadeIn();
 }
 
 function getCountriesData() {
@@ -144,5 +178,5 @@ $('#dataButton').on('click', () => {
     getCountriesData();
     $('.spinner-border').remove();
     $('p').text('Folder has been read');
-  }, 5000);
+  }, 1000);
 });

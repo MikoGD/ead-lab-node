@@ -1,8 +1,33 @@
 "use strict";
+const bgColors = [
+    'bg-primary',
+    'bg-secondary',
+    'bg-danger',
+    'bg-success',
+    'bg-warning',
+    'bg-info',
+];
 let currentRowCount = 0;
 let headers = [];
 let currentRows = [];
 let totalRows = [];
+// eslint-disable-next-line no-undef
+function addCellColorChange(elements) {
+    elements.on('click', (event) => {
+        var _a;
+        const classToRemove = (_a = $(event.target).attr('class')) === null || _a === void 0 ? void 0 : _a.split(' ').pop();
+        if (classToRemove && classToRemove !== 'row-cell') {
+            event.target.classList.remove(classToRemove);
+        }
+        let colorIndex = Math.floor(Math.random() * bgColors.length);
+        let newClass = bgColors[colorIndex];
+        if (newClass === classToRemove) {
+            colorIndex += 1;
+            newClass = bgColors[colorIndex];
+        }
+        event.target.classList.add(newClass);
+    });
+}
 function addRow() {
     const nextRows = totalRows.slice(currentRowCount, currentRowCount + 20);
     currentRows = [...currentRows, ...nextRows];
@@ -10,9 +35,8 @@ function addRow() {
         const currRow = $('<tr>');
         headers.forEach((currHeader, headerIndex, headersArr) => {
             var _a;
-            let cell;
+            const cell = $('<td>', { class: 'row-cell' });
             if (headerIndex === headersArr.length - 1) {
-                cell = $('<td>');
                 const flag = $('<img>', {
                     src: row[currHeader],
                     class: 'flag',
@@ -20,9 +44,10 @@ function addRow() {
                 cell.append(flag);
             }
             else {
-                cell = $('<td>').text((_a = row[currHeader]) !== null && _a !== void 0 ? _a : '&nbsp;');
+                cell.text((_a = row[currHeader]) !== null && _a !== void 0 ? _a : 'N/A');
             }
             currRow.append(cell);
+            addCellColorChange(currRow.children('td.row-cell'));
         });
         $('#tableBody').append(currRow);
     });
@@ -44,9 +69,8 @@ function createTable() {
         const currRow = $('<tr>');
         headers.forEach((currHeader, headerIndex, headersArr) => {
             var _a;
-            let cell;
+            const cell = $('<td>', { class: 'row-cell' });
             if (headerIndex === headersArr.length - 1) {
-                cell = $('<td>');
                 const flag = $('<img>', {
                     src: row[currHeader],
                     class: 'flag',
@@ -54,7 +78,7 @@ function createTable() {
                 cell.append(flag);
             }
             else {
-                cell = $('<td>').text((_a = row[currHeader]) !== null && _a !== void 0 ? _a : '');
+                cell.text((_a = row[currHeader]) !== null && _a !== void 0 ? _a : '');
             }
             currRow.append(cell);
         });
@@ -64,7 +88,7 @@ function createTable() {
     const tableContainer = $('#tableContainer');
     table.hide();
     tableContainer.append(table);
-    table.fadeIn();
+    addCellColorChange($('.row-cell'));
     tableContainer.on('scroll', (event) => {
         const { offsetHeight, scrollTop, scrollHeight } = event.target;
         const totalRowsLength = totalRows.length;
@@ -78,6 +102,7 @@ function createTable() {
                     : currentRowCount + 20;
         }
     });
+    table.fadeIn();
 }
 function getCountriesData() {
     const xhttp = new XMLHttpRequest();
@@ -104,5 +129,5 @@ $('#dataButton').on('click', () => {
         getCountriesData();
         $('.spinner-border').remove();
         $('p').text('Folder has been read');
-    }, 5000);
+    }, 1000);
 });
