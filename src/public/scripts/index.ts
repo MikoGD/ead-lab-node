@@ -105,7 +105,9 @@ function createTable() {
 
 function getCountriesData() {
   const xhttp = new XMLHttpRequest();
+
   const start = performance.now();
+
   xhttp.onload = function () {
     const countriesData: Record<string, Country> = JSON.parse(this.response);
 
@@ -131,5 +133,11 @@ function getCountriesData() {
 
 $('#dataButton').on('click', () => {
   console.log('button clicked');
-  getCountriesData();
+
+  $('.spinner-border').removeClass('invisible');
+
+  setTimeout(() => {
+    getCountriesData();
+    $('.spinner-border').remove();
+  }, 5000);
 });

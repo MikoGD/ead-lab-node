@@ -1,0 +1,9 @@
+#tableContainer {
+  height: 50rem;
+  overflow: auto;
+}
+
+.flag {
+  height: 5rem;
+  width: 100%;
+}
