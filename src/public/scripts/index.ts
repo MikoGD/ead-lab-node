@@ -176,7 +176,9 @@ function createTable(displayHeaders: string[]) {
   displayHeaders.forEach((headerString, index) => {
     const col = $('<th>', {
       scope: 'col',
-      class: 'text-center table-header',
+      class: `text-center table-header ${
+        index !== headers.length - 1 ? 'col-pointer' : ''
+      }`,
       id: `col-${headers[index]}`,
     }).text(headerString);
 
@@ -185,13 +187,15 @@ function createTable(displayHeaders: string[]) {
     col.append(icon);
 
     if (index === 0) {
-      icon.addClass('fa-long-up');
+      icon.addClass('fa-up-long');
 
       currentFilter.header = headers[index];
       currentFilter.type = FILTER_TYPE.ASCENDING;
     }
 
-    addFilterOnClick(col, headers[index]);
+    if (index !== headers.length - 1) {
+      addFilterOnClick(col, headers[index]);
+    }
 
     headerRow.append(col);
   });
