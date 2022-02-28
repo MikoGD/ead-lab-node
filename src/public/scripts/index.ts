@@ -8,6 +8,16 @@ interface Country {
   flag_base64?: string | undefined;
 }
 
+enum FILTER_TYPE {
+  ASCENDING,
+  DESCENDING,
+}
+
+interface Filter {
+  header: string;
+  type: FILTER_TYPE;
+}
+
 const bgColors = [
   'bg-primary',
   'bg-secondary',
@@ -21,6 +31,7 @@ let currentRowCount = 0;
 let headers: string[] = [];
 let currentRows: Country[] = [];
 let totalRows: Country[] = [];
+const currentFilter: Partial<Filter> = {};
 
 // eslint-disable-next-line no-undef
 function addCellColorChange(elements: JQuery<HTMLElement>) {
@@ -73,6 +84,86 @@ function addRow() {
   });
 }
 
+function renderFilteredRows(filteredRows: Country[]) {
+  $('#tableBody').empty();
+  console.log(filteredRows.slice(0, 10));
+
+  filteredRows.forEach((row) => {
+    const currRow = $('<tr>');
+    headers.forEach((currHeader, headerIndex, headersArr) => {
+      const cell = $('<td>', { class: 'row-cell text-center' });
+
+      if (headerIndex === headersArr.length - 1) {
+        const flag = $('<img>', {
+          src: row[currHeader],
+          class: 'flag',
+        });
+
+        cell.append(flag);
+      } else {
+        cell.text(row[currHeader] ?? 'N/A');
+      }
+
+      currRow.append(cell);
+
+      addCellColorChange(currRow.children('td.row-cell'));
+    });
+
+    $('#tableBody').append(currRow);
+  });
+}
+
+function applyFilter(header: string, filterType: FILTER_TYPE) {
+  console.log('header: ', header);
+  console.log('filterType: ', filterType);
+
+  currentRows = currentRows.sort((a, b) => {
+    const textA = !a || !a[header] ? '' : a[header]!.toUpperCase();
+    const textB = !b || !b[header] ? '' : b[header]!.toUpperCase();
+
+    /* eslint-disable no-nested-ternary */
+    if (filterType === FILTER_TYPE.ASCENDING) {
+      return textA < textB ? -1 : textA > textB ? 1 : 0;
+    }
+
+    return textA > textB ? -1 : textA < textB ? 1 : 0;
+    /* eslint-enable no-nested-ternary */
+  });
+
+  renderFilteredRows(currentRows);
+}
+
+/* eslint-disable no-undef */
+function addFilterOnClick(col: JQuery<HTMLElement>, header: string) {
+  /* eslint-enable no-undef */
+  col.on('click', () => {
+    if (currentFilter.header !== header) {
+      $(`#col-${currentFilter.header}`)
+        .children('span')
+        .removeClass('fa-up-long');
+      $(`#col-${currentFilter.header}`)
+        .children('span')
+        .removeClass('fa-down-long');
+    }
+
+    currentFilter.header = header;
+
+    const icon = col.children('span');
+
+    if (currentFilter.type === FILTER_TYPE.ASCENDING) {
+      icon.removeClass('fa-up-long');
+      icon.addClass('fa-down-long');
+      currentFilter.type = FILTER_TYPE.DESCENDING;
+    } else {
+      icon.removeClass('fa-down-long');
+      icon.addClass('fa-up-long');
+      currentFilter.type = FILTER_TYPE.ASCENDING;
+    }
+
+    applyFilter(header, currentFilter.type);
+  });
+}
+
 function createTable(displayHeaders: string[]) {
   const table = $('<table>', {
     class: 'table overflow-scroll',
@@ -81,10 +172,27 @@ function createTable(displayHeaders: string[]) {
 
   const header = $('<thead>');
   const headerRow = header.append('<tr>');
-  displayHeaders.forEach((headerString) => {
-    const col = $('<th>', { scope: 'col', class: 'text-center' }).text(
-      headerString
-    );
+
+  displayHeaders.forEach((headerString, index) => {
+    const col = $('<th>', {
+      scope: 'col',
+      class: 'text-center table-header',
+      id: `col-${headers[index]}`,
+    }).text(headerString);
+
+    const icon = $('<span>', { class: 'fa-solid' });
+
+    col.append(icon);
+
+    if (index === 0) {
+      icon.addClass('fa-long-up');
+
+      currentFilter.header = headers[index];
+      currentFilter.type = FILTER_TYPE.ASCENDING;
+    }
+
+    addFilterOnClick(col, headers[index]);
+
     headerRow.append(col);
   });
 
