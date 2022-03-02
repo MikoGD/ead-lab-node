@@ -21,20 +21,27 @@ function handleError(err: string, res: ServerResponse) {
 }
 
 async function sendFile(filePath: string, res: ServerResponse) {
+  console.log(filePath);
   try {
-    const file = await fs.readFile(
-      path.join(
-        __dirname,
-        `public${filePath === '/' ? '/index.html' : filePath}`
-      )
-    );
+    if (filePath === '/' || filePath.includes('html')) {
+      const file = await fs.readFile(
+        path.join(__dirname, '../public/index.html')
+      );
 
-    if (filePath.includes('css')) {
-      res.writeHead(200, { 'Content-Type': 'text/css' });
+      res.writeHead(200, { 'Content-Type': 'text/html' });
+      res.write(file);
+      res.end();
     }
 
-    res.write(file);
-    res.end();
+    if (filePath.includes('js')) {
+      const file = await fs.readFile(
+        path.join(__dirname, '../public/scripts/index.js')
+      );
+
+      res.writeHead(200, { 'Content-Type': 'application/javascript' });
+      res.write(file);
+      res.end();
+    }
   } catch (err) {
     handleError(err as string, res);
   }
@@ -48,27 +55,27 @@ async function sendCountriesData(res: ServerResponse) {
   } else {
     const startTime = performance.now();
     const names = await fs.readFile(
-      path.join(__dirname, 'country-objects/country-by-name.json')
+      path.join(__dirname, '../country-objects/country-by-name.json')
     );
 
     const currencies = await fs.readFile(
-      path.join(__dirname, 'country-objects/country-by-currency-code.json')
+      path.join(__dirname, '../country-objects/country-by-currency-code.json')
     );
 
     const capitals = await fs.readFile(
-      path.join(__dirname, 'country-objects/country-by-capital-city.json')
+      path.join(__dirname, '../country-objects/country-by-capital-city.json')
     );
 
     const domain = await fs.readFile(
-      path.join(__dirname, 'country-objects/country-by-domain-tld.json')
+      path.join(__dirname, '../country-objects/country-by-domain-tld.json')
     );
 
     const flag = await fs.readFile(
-      path.join(__dirname, 'country-objects/country-by-flag.json')
+      path.join(__dirname, '../country-objects/country-by-flag.json')
     );
 
     const continents = await fs.readFile(
-      path.join(__dirname, 'country-objects/country-by-continent.json')
+      path.join(__dirname, '../country-objects/country-by-continent.json')
     );
 
     const rawData = await Promise.all([
@@ -120,7 +127,7 @@ async function sendResource(resourcePath: string, res: ServerResponse) {
 
 async function handleRequest(req: IncomingMessage, res: ServerResponse) {
   if (!req.url) {
-    res.write('<h1>Error to read url</h1>');
+    res.write('<h1>Error reading url</h1>');
     res.end();
     return;
   }
@@ -140,7 +147,6 @@ async function handleRequest(req: IncomingMessage, res: ServerResponse) {
 
 http
   .createServer((req, res) => {
-    res.writeHead(200, { 'Content-Type': 'text/html' });
     handleRequest(req, res);
   })
   .listen(3000);
