@@ -1,17 +1,7 @@
 import '../styles/index.css';
 import { Country, CountryTable, FILTER_TYPE } from './types';
 import { createTable } from './table';
-
-const countryTable: CountryTable = {
-  currentRows: [],
-  currentRowCount: 0,
-  filter: {
-    header: '',
-    type: FILTER_TYPE.ASCENDING,
-  },
-  headers: {} as Country,
-  rows: [],
-};
+import { addRowsToStore, store, addHeaders, updateFilter } from './store';
 
 function getCountriesData() {
   const xhttp = new XMLHttpRequest();
@@ -21,7 +11,7 @@ function getCountriesData() {
   xhttp.onload = function () {
     const countriesData: Record<string, Country> = JSON.parse(this.response);
 
-    countryTable.headers = Object.keys(Object.values(countriesData)[0]).reduce(
+    const headers = Object.keys(Object.values(countriesData)[0]).reduce(
       (currHeaders: Partial<Country>, header) => {
         switch (header) {
           case 'currency_code':
@@ -43,16 +33,27 @@ function getCountriesData() {
       },
       {}
     ) as Country;
+    console.log('headers: ', headers);
 
-    countryTable.rows = Object.values(countriesData);
+    store.dispatch(addHeaders(headers));
 
-    countryTable.currentRows = [
-      ...countryTable.rows.slice(countryTable.currentRowCount, 20),
-    ];
+    store.dispatch(
+      addRowsToStore({
+        rows: Object.values(countriesData),
+        count: 20,
+      })
+    );
 
-    countryTable.currentRowCount += 20;
+    store.dispatch(
+      updateFilter({
+        header: Object.keys(headers)[0],
+        type: FILTER_TYPE.ASCENDING,
+      })
+    );
 
-    createTable(countryTable);
+    console.log('initial filter', store.getState().filter);
+
+    createTable();
     const end = performance.now();
     console.log(`Time to render table: ${end - start}`);
   };

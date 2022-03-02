@@ -1,21 +1,24 @@
-import { CountryTable, FILTER_TYPE } from './types';
+import { FILTER_TYPE } from './types';
 import {
   addCellColorChangeClickListener,
   addFilterOnClickListener,
   applyFilter,
 } from './utils';
+import { addRowsToCurrent, store } from './store';
 
-function addRow(countryTable: CountryTable) {
-  const { rows, currentRows, currentRowCount } = countryTable;
-  const nextRows = rows.slice(currentRowCount, currentRowCount + 20);
+function addRow() {
+  const { rows, currentRowCount } = store.getState();
+  const increment = 20;
 
-  countryTable.currentRows = [...currentRows, ...nextRows];
+  const nextRows = rows.slice(currentRowCount, currentRowCount + increment);
 
-  applyFilter(countryTable);
+  store.dispatch(addRowsToCurrent({ rows: nextRows, count: increment }));
+
+  applyFilter();
 }
 
-export function createTableHeaders(countryTable: CountryTable) {
-  const { headers } = countryTable;
+export function createTableHeaders() {
+  const { headers } = store.getState();
   const headersLength = Object.keys(headers).length;
   const headerRowContainer = $('<thead>');
   const headerRow = $('<tr>');
@@ -39,7 +42,7 @@ export function createTableHeaders(countryTable: CountryTable) {
     }
 
     if (index !== headersLength - 1) {
-      addFilterOnClickListener(col, countryTable, headers[index]);
+      addFilterOnClickListener(col, header);
     }
 
     headerRow.append(col);
@@ -50,8 +53,8 @@ export function createTableHeaders(countryTable: CountryTable) {
   return headerRowContainer;
 }
 
-export function createTableBody(countryTable: CountryTable) {
-  const { currentRows, headers } = countryTable;
+export function createTableBody() {
+  const { currentRows, headers } = store.getState();
   const tableBody = $('<tbody>', { id: 'tableBody' });
 
   currentRows.forEach((row) => {
@@ -80,14 +83,14 @@ export function createTableBody(countryTable: CountryTable) {
   return tableBody;
 }
 
-export function createTable(countryTable: CountryTable) {
+export function createTable() {
   const table = $('<table>', {
     class: 'table overflow-scroll',
     id: 'countryTable',
   });
 
-  const tableHeader = createTableHeaders(countryTable);
-  const tableBody = createTableBody(countryTable);
+  const tableHeader = createTableHeaders();
+  const tableBody = createTableBody();
 
   table.append(tableHeader);
   table.append(tableBody);
@@ -102,9 +105,7 @@ export function createTable(countryTable: CountryTable) {
 
   tableContainer.on('scroll', (event) => {
     const { offsetHeight, scrollTop, scrollHeight } = event.target;
-    const { rows, currentRowCount, filter } = countryTable;
-
-    const totalRowsLength = countryTable.rows.length;
+    const { rows, currentRowCount, filter } = store.getState();
 
     // Check if scroll is 80% down if so more rows if there are more
     if (
@@ -112,12 +113,7 @@ export function createTable(countryTable: CountryTable) {
       currentRowCount < rows.length &&
       filter.type !== FILTER_TYPE.DESCENDING
     ) {
-      addRow(countryTable);
-
-      countryTable.currentRowCount =
-        currentRowCount + 20 > totalRowsLength
-          ? totalRowsLength
-          : currentRowCount + 20;
+      addRow();
     }
   });
 

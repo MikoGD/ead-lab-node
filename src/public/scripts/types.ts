@@ -9,8 +9,8 @@ export interface Country {
 }
 
 export enum FILTER_TYPE {
-  ASCENDING,
-  DESCENDING,
+  ASCENDING = 'ASC',
+  DESCENDING = 'DESC',
 }
 
 export interface Filter {
@@ -24,6 +24,7 @@ export interface CountryTable {
   filter: Filter;
   headers: Country;
   rows: Country[];
+  totalRows: number;
 }
 
 export const bgColors = [

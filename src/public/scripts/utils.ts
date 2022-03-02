@@ -1,6 +1,6 @@
-import { bgColors, FILTER_TYPE, CountryTable } from './types';
+import { bgColors, FILTER_TYPE } from './types';
+import { store, updateCurrentRows, updateFilter } from './store';
 
-// eslint-disable-next-line no-undef
 export function addCellColorChangeClickListener(elements: JQuery<HTMLElement>) {
   elements.on('click', (event) => {
     const classToRemove = $(event.target).attr('class')?.split(' ').pop();
@@ -21,7 +21,11 @@ export function addCellColorChangeClickListener(elements: JQuery<HTMLElement>) {
   });
 }
 
-export function renderFilteredRows({ currentRows, headers }: CountryTable) {
+export function renderFilteredRows() {
+  const { currentRows, headers, filter } = store.getState();
+  console.log('currentRows: ', currentRows);
+  console.log('filter: ', filter);
+
   $('#tableBody').empty();
 
   currentRows.forEach((row) => {
@@ -50,55 +54,63 @@ export function renderFilteredRows({ currentRows, headers }: CountryTable) {
   });
 }
 
-export function applyFilter(countryTable: CountryTable) {
+export function applyFilter() {
   const {
     filter: { header, type: filterType },
     currentRows,
-  } = countryTable;
+  } = store.getState();
 
-  countryTable.currentRows = currentRows.sort((a, b) => {
-    const textA = !a || !a[header] ? '' : a[header]!.toUpperCase();
-    const textB = !b || !b[header] ? '' : b[header]!.toUpperCase();
+  const currentRowsCopy = [...currentRows];
 
-    /* eslint-disable no-nested-ternary */
-    if (filterType === FILTER_TYPE.ASCENDING) {
-      return textA < textB ? -1 : textA > textB ? 1 : 0;
-    }
+  store.dispatch(
+    updateCurrentRows(
+      currentRowsCopy.sort((a, b) => {
+        const textA = !a || !a[header] ? '' : a[header]!.toUpperCase();
+        const textB = !b || !b[header] ? '' : b[header]!.toUpperCase();
 
-    return textA > textB ? -1 : textA < textB ? 1 : 0;
-    /* eslint-enable no-nested-ternary */
-  });
+        /* eslint-disable no-nested-ternary */
+        if (filterType === FILTER_TYPE.ASCENDING) {
+          return textA < textB ? -1 : textA > textB ? 1 : 0;
+        }
 
-  renderFilteredRows(countryTable);
+        return textA > textB ? -1 : textA < textB ? 1 : 0;
+        /* eslint-enable no-nested-ternary */
+      })
+    )
+  );
+
+  renderFilteredRows();
 }
 
 export function addFilterOnClickListener(
   col: JQuery<HTMLElement>,
-  countryTable: CountryTable,
   currHeader: string
 ) {
-  const { filter } = countryTable;
+  console.log('current header to add onClick: ', currHeader);
 
   col.on('click', () => {
+    const { filter } = store.getState();
+
     if (filter.header !== currHeader) {
       $(`#col-${filter.header}`).children('span').removeClass('fa-up-long');
       $(`#col-${filter.header}`).children('span').removeClass('fa-down-long');
     }
 
-    filter.header = currHeader;
-
     const icon = col.children('span');
+    const newFilter = { header: currHeader, type: FILTER_TYPE.ASCENDING };
 
     if (filter.type === FILTER_TYPE.ASCENDING) {
       icon.removeClass('fa-up-long');
       icon.addClass('fa-down-long');
-      filter.type = FILTER_TYPE.DESCENDING;
+
+      newFilter.type = FILTER_TYPE.DESCENDING;
     } else {
       icon.removeClass('fa-down-long');
       icon.addClass('fa-up-long');
-      filter.type = FILTER_TYPE.ASCENDING;
     }
 
-    applyFilter(countryTable);
+    store.dispatch(updateFilter(newFilter));
+
+    applyFilter();
   });
 }
