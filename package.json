@@ -11,16 +11,25 @@
     "@types/node": "^17.0.18",
     "@typescript-eslint/eslint-plugin": "^5.11.0",
     "@typescript-eslint/parser": "^5.11.0",
+    "css-loader": "^6.6.0",
     "eslint": "^8.9.0",
     "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-airbnb-typescript": "^16.1.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.25.4",
+    "filemanager-webpack-plugin": "^6.1.7",
+    "html-webpack-plugin": "^5.5.0",
     "nodemon": "^2.0.15",
-    "prettier": "^2.5.1"
+    "prettier": "^2.5.1",
+    "style-loader": "^3.3.1",
+    "ts-loader": "^9.2.6",
+    "webpack": "^5.69.1",
+    "webpack-cli": "^4.9.2"
   },
   "scripts": {
-    "start": "tsc -w",
-    "start_server": "nodemon dist/index.js"
+    "start_server": "tsc -w",
+    "start_client": "webpack --config ./webpack.config.js -w",
+    "run_server": "nodemon dist/server/index.js"
   },
   "dependencies": {
     "@types/jquery": "^3.5.13",

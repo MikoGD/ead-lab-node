@@ -6,10 +6,11 @@
     "rootDir": "src"
   },
   "include": [
-    "src/**/*"
+    "src/server/**/*"
   ],
   "exclude": [
     "node_modules",
+    "src/public",
     "**/*.spec.ts"
   ]
 }
