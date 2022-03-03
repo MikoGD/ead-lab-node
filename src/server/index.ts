@@ -54,27 +54,27 @@ async function sendCountriesData(res: ServerResponse) {
     res.end();
   } else {
     const startTime = performance.now();
-    const names = await fs.readFile(
+    const names = fs.readFile(
       path.join(__dirname, '../country-objects/country-by-name.json')
     );
 
-    const currencies = await fs.readFile(
+    const currencies = fs.readFile(
       path.join(__dirname, '../country-objects/country-by-currency-code.json')
     );
 
-    const capitals = await fs.readFile(
+    const capitals = fs.readFile(
       path.join(__dirname, '../country-objects/country-by-capital-city.json')
     );
 
-    const domain = await fs.readFile(
+    const domain = fs.readFile(
       path.join(__dirname, '../country-objects/country-by-domain-tld.json')
     );
 
-    const flag = await fs.readFile(
+    const flag = fs.readFile(
       path.join(__dirname, '../country-objects/country-by-flag.json')
     );
 
-    const continents = await fs.readFile(
+    const continents = fs.readFile(
       path.join(__dirname, '../country-objects/country-by-continent.json')
     );
 
