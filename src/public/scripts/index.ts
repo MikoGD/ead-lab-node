@@ -1,6 +1,6 @@
 import '../styles/index.css';
 import { Country, FILTER_TYPE } from './types';
-import { createTable } from './table';
+import { addTableButtons, createTable } from './table';
 import { addRowsToStore, store, addHeaders, updateFilter } from './store';
 
 function sendCountriesDataRequest() {
@@ -53,6 +53,7 @@ function sendCountriesDataRequest() {
 
     console.log('initial filter', store.getState().filter);
 
+    addTableButtons();
     createTable();
     const end = performance.now();
     console.log(`Time to render table: ${end - start}`);

@@ -31,6 +31,19 @@ const tableSlice = createSlice({
       state.currentRows = rows.slice(0, count);
     },
     updateFilter: (state, action: PayloadAction<Filter>) => {
+      const { header, type } = action.payload;
+      const { headers } = state;
+
+      const firstHeader = Object.keys(headers)[0];
+      console.log('[updateFilter] - header: ', header);
+      console.log('[updateFilter] - type: ', type);
+
+      if (header !== firstHeader || type !== FILTER_TYPE.ASCENDING) {
+        $('#resetButton').prop('disabled', false);
+      } else {
+        $('#resetButton').prop('disabled', true);
+      }
+
       state.filter = action.payload;
     },
     addHeaders: (state, action: PayloadAction<Country>) => {

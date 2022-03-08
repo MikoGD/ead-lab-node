@@ -4,17 +4,36 @@ import {
   addFilterOnClickListener,
   applyFilter,
 } from './utils';
-import { addRowsToCurrent, store } from './store';
+import { addRowsToCurrent, store, updateFilter } from './store';
 
-function addRow() {
-  const { rows, currentRowCount } = store.getState();
+type JQueryScrollEvent = JQuery.ScrollEvent<
+  HTMLElement,
+  undefined,
+  HTMLElement,
+  HTMLElement
+>;
+
+function addRow(scrollEvent?: JQueryScrollEvent) {
+  const { rows, currentRowCount, filter } = store.getState();
   const increment = 20;
 
   const nextRows = rows.slice(currentRowCount, currentRowCount + increment);
+  if (scrollEvent) {
+    const { offsetHeight, scrollTop, scrollHeight } = scrollEvent.target;
 
-  store.dispatch(addRowsToCurrent({ rows: nextRows, count: increment }));
-
-  applyFilter();
+    // Check if scroll is 80% down if so more rows if there are more
+    if (
+      offsetHeight + scrollTop >= scrollHeight - scrollHeight * 0.2 &&
+      currentRowCount < rows.length &&
+      filter.type !== FILTER_TYPE.DESCENDING
+    ) {
+      store.dispatch(addRowsToCurrent({ rows: nextRows, count: increment }));
+      applyFilter();
+    }
+  } else if (currentRowCount < rows.length) {
+    store.dispatch(addRowsToCurrent({ rows: nextRows, count: increment }));
+    applyFilter();
+  }
 }
 
 export function createTableHeaders() {
@@ -83,6 +102,57 @@ export function createTableBody() {
   return tableBody;
 }
 
+function createResetFilterButton() {
+  const resetFilterButton = $('<button>', {
+    type: 'button',
+    class: 'btn btn-secondary me-3',
+    id: 'resetButton',
+  })
+    .text('Reset filter')
+    .prop('disabled', true)
+    .on('click', () => {
+      const { headers, filter } = store.getState();
+
+      const firstHeader = Object.keys(headers)[0];
+      console.log('firstHeader: ', firstHeader);
+
+      store.dispatch(
+        updateFilter({ header: firstHeader, type: FILTER_TYPE.ASCENDING })
+      );
+
+      if (filter.type === FILTER_TYPE.ASCENDING) {
+        $('.fa-up-long').removeClass('fa-up-long');
+      } else {
+        $('.fa-down-long').removeClass('fa-down-long');
+      }
+
+      $(`#col-${firstHeader}`).children('span').addClass('fa-up-long');
+
+      applyFilter();
+    });
+
+  return resetFilterButton;
+}
+
+function createLoadMoreButton() {
+  const loadMoreButton = $('<button>', {
+    class: 'btn btn-secondary',
+    id: 'loadMoreButton',
+    type: 'button',
+  })
+    .text('Load next rows')
+    .on('click', () => addRow());
+
+  return loadMoreButton;
+}
+
+export function addTableButtons() {
+  const resetButton = createResetFilterButton();
+  const loadMoreButton = createLoadMoreButton();
+
+  $('#tableContainer').append(resetButton).append(loadMoreButton);
+}
+
 export function createTable() {
   const table = $('<table>', {
     class: 'table overflow-scroll',
@@ -104,17 +174,7 @@ export function createTable() {
   addCellColorChangeClickListener($('.row-cell'));
 
   tableContainer.on('scroll', (event) => {
-    const { offsetHeight, scrollTop, scrollHeight } = event.target;
-    const { rows, currentRowCount, filter } = store.getState();
-
-    // Check if scroll is 80% down if so more rows if there are more
-    if (
-      offsetHeight + scrollTop >= scrollHeight - scrollHeight * 0.2 &&
-      currentRowCount < rows.length &&
-      filter.type !== FILTER_TYPE.DESCENDING
-    ) {
-      addRow();
-    }
+    addRow(event);
   });
 
   table.fadeIn();
