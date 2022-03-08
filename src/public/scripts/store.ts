@@ -1,6 +1,11 @@
 import { createSlice, configureStore, PayloadAction } from '@reduxjs/toolkit';
 import { FILTER_TYPE, Country, Filter, CountryTable } from './types';
 
+interface RowPayload {
+  rows: Country[];
+  count: number;
+}
+
 const defaultStore: CountryTable = {
   currentRows: [],
   currentRowCount: 0,
@@ -12,11 +17,6 @@ const defaultStore: CountryTable = {
   rows: [],
   totalRows: 0,
 };
-
-interface RowPayload {
-  rows: Country[];
-  count: number;
-}
 
 const tableSlice = createSlice({
   name: 'table',
