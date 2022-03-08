@@ -1,9 +1,9 @@
 import '../styles/index.css';
-import { Country, CountryTable, FILTER_TYPE } from './types';
+import { Country, FILTER_TYPE } from './types';
 import { createTable } from './table';
 import { addRowsToStore, store, addHeaders, updateFilter } from './store';
 
-function getCountriesData() {
+function sendCountriesDataRequest() {
   const xhttp = new XMLHttpRequest();
 
   const start = performance.now();
@@ -67,7 +67,7 @@ $('#dataButton').on('click', (event) => {
   $('.spinner-border').removeClass('invisible');
 
   setTimeout(() => {
-    getCountriesData();
+    sendCountriesDataRequest();
 
     $('.spinner-border').remove();
 
