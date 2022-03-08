@@ -64,7 +64,6 @@ function sendCountriesDataRequest() {
 }
 
 $('#dataButton').on('click', (event) => {
-  event.target.setAttribute('disabled', 'true');
   $('.spinner-border').removeClass('invisible');
 
   setTimeout(() => {
@@ -73,8 +72,11 @@ $('#dataButton').on('click', (event) => {
     $('.spinner-border').remove();
 
     const paragraph = $('p');
+
     paragraph.fadeIn();
     paragraph.text('Folder has been read!!!');
     paragraph.addClass('display-2 text-center');
   }, 1000);
+
+  $(event.target).addClass('remove');
 });
