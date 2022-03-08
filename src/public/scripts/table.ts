@@ -34,6 +34,10 @@ function addRow(scrollEvent?: JQueryScrollEvent) {
     store.dispatch(addRowsToCurrent({ rows: nextRows, count: increment }));
     applyFilter();
   }
+
+  if (currentRowCount + increment > rows.length) {
+    $('#loadMoreButton').prop('disabled', true);
+  }
 }
 
 export function createTableHeaders() {
