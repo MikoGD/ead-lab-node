@@ -158,13 +158,15 @@ function createLoadMoreButton() {
 function createLoadAllRowsButton() {
   const loadMoreButton = $('<button>', {
     class: 'btn btn-secondary',
-    id: 'loadMoreButton',
+    id: 'loadAllButton',
     type: 'button',
   })
     .text('Load all rows')
-    .on('click', () => {
+    .on('click', (event) => {
       store.dispatch(addAllRowsToCurrent());
       applyFilter();
+      $(event.target).prop('disabled', true);
+      $('#loadMoreButton').prop('disabled', true);
     });
 
   return loadMoreButton;
