@@ -76,7 +76,11 @@
           When the button is clicked. A XMLHttpRequest object is created. A
           callback is given to its onload function. This callback will parse the
           response and get the header and rows from the response. The headers
-          and rows array are used to filter the table and add new rows.
+          and rows array are used to filter the table and add new rows. This
+          data is store in a redux. Redux was needed as when the functions were
+          refactored into separate files, it removed the closure to the old
+          global state. Instead of implementing my own state management I used
+          redux as I was already familiar with it.
           <br />
           <br />
           On the server side it reads the all the JSON file and creates a map
@@ -90,19 +94,30 @@
           built. 20 more rows are added as the user scrolls. There is an event
           that checks everytime the user scrolls. When the scroll reaches 80%
           down the max scroll it adds more rows. This is done by slicing the
-          data.
+          data. More rows can also be loaded with the button and all of the rows
+          can also be loaded through another button.
+          <br />
+          <br />
+          I added filtering as I thought it could count as one of the JQuery
+          requirements but ultimately decided to make a modal for the JQuery
+          requirements. To filter a column click on the column header. A button
+          is provided to reset the filter.
+          <br />
+          <br />
+          In the modal there are examples of fading out, in and spinning a blue
+          square using JQuery.
         </p>
       </div>
       <div class="d-flex flex-column align-items-center w-100">
-        <button type="button" class="btn btn-primary mt-5" id="dataButton">
-          Get data
-        </button>
         <button
           type="button"
-          class="btn btn-primary mt-2 mb-5"
+          class="btn btn-primary mt-5 mb-5"
           id="modalButton"
         >
           Open modal
+        </button>
+        <button type="button" class="btn btn-primary mt-2" id="dataButton">
+          Get data
         </button>
         <spinner class="spinner-border invisible" role="status">
           <span class="sr-only" />
