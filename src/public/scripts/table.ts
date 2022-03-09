@@ -123,7 +123,6 @@ function createResetFilterButton() {
       const { headers, filter } = store.getState();
 
       const firstHeader = Object.keys(headers)[0];
-      console.log('firstHeader: ', firstHeader);
 
       store.dispatch(
         updateFilter({ header: firstHeader, type: FILTER_TYPE.ASCENDING })

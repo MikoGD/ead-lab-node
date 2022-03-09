@@ -7,8 +7,6 @@ import { openModal, setupModalButtons } from './modal';
 function sendCountriesDataRequest() {
   const xhttp = new XMLHttpRequest();
 
-  const start = performance.now();
-
   xhttp.onload = function () {
     const countriesData: Record<string, Country> = JSON.parse(this.response);
 
@@ -34,7 +32,6 @@ function sendCountriesDataRequest() {
       },
       {}
     ) as Country;
-    console.log('headers: ', headers);
 
     store.dispatch(addHeaders(headers));
 
@@ -52,12 +49,8 @@ function sendCountriesDataRequest() {
       })
     );
 
-    console.log('initial filter', store.getState().filter);
-
     addTableButtons();
     createTable();
-    const end = performance.now();
-    console.log(`Time to render table: ${end - start}`);
   };
 
   xhttp.open('GET', '/api/countries', true);
@@ -79,7 +72,7 @@ $('#dataButton').on('click', (event) => {
     paragraph.fadeIn();
     paragraph.text('Folder has been read!!!');
     paragraph.addClass('display-2 text-center');
-  }, 1000);
+  }, 5000);
 
   $(event.target).addClass('remove');
 });

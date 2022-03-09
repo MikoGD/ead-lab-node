@@ -23,8 +23,6 @@ export function addCellColorChangeClickListener(elements: JQuery<HTMLElement>) {
 
 export function renderFilteredRows() {
   const { currentRows, headers, filter } = store.getState();
-  console.log('currentRows: ', currentRows);
-  console.log('filter: ', filter);
 
   $('#tableBody').empty();
 
@@ -86,8 +84,6 @@ export function addFilterOnClickListener(
   col: JQuery<HTMLElement>,
   currHeader: string
 ) {
-  console.log('current header to add onClick: ', currHeader);
-
   col.on('click', () => {
     const { filter } = store.getState();
 

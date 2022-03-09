@@ -34,7 +34,6 @@ function handleError(err: string, res: ServerResponse) {
 }
 
 async function sendFile(filePath: string, res: ServerResponse) {
-  console.log(filePath);
   try {
     if (filePath === '/' || filePath.includes('html')) {
       const file = await fs.readFile(
@@ -111,11 +110,7 @@ async function sendCountriesData(res: ServerResponse) {
     res.write(JSON.stringify(mergedCountriesData));
     res.end();
   } else {
-    const startTime = performance.now();
-
     const rawCountryData = await getCountryData();
-
-    const readingTime = performance.now();
 
     const parsedData: CountryEntry[][] = rawCountryData.map((currData) =>
       JSON.parse(String(currData))
@@ -123,13 +118,6 @@ async function sendCountriesData(res: ServerResponse) {
 
     const mergedCountriesData = mergeCountriesData(parsedData);
 
-    const parsingTime = performance.now();
-
-    console.log(`Time to read files: ${readingTime - startTime}`);
-    console.log(`Time to parse data: ${parsingTime - readingTime}`);
-    console.log(`Total elapsed time: ${parsingTime - startTime}`);
-
-    console.log('sending files');
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.write(JSON.stringify(mergedCountriesData));
     res.end();

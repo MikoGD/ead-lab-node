@@ -29,7 +29,8 @@
   "scripts": {
     "start_server": "tsc -w",
     "start_client": "webpack --config ./webpack.config.js -w",
-    "run_server": "nodemon dist/server/index.js"
+    "run_server": "nodemon dist/server/index.js",
+    "build": "tsc && webpack --config ./webpack.config.js"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^1.8.0",
