@@ -16,16 +16,12 @@ export function setupModalButtons() {
   });
 
   $('#modalSpinButton').on('click', () => {
-    $('#modalSquare').animate(
-      {
-        borderSpacing: 315,
-      },
+    $({ deg: 0 }).animate(
+      { deg: 315 },
       {
         duration: 1000,
         step: function (now) {
-          $(this).css('-webkit-transform', 'rotate(' + now + 'deg)');
-          $(this).css('-moz-transform', 'rotate(' + now + 'deg)');
-          $(this).css('transform', 'rotate(' + now + 'deg)');
+          $('#modalSquare').css({ transform: `rotate(${now}deg)` });
         },
       }
     );
