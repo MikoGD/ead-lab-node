@@ -35,8 +35,6 @@ const tableSlice = createSlice({
       const { headers } = state;
 
       const firstHeader = Object.keys(headers)[0];
-      console.log('[updateFilter] - header: ', header);
-      console.log('[updateFilter] - type: ', type);
 
       if (header !== firstHeader || type !== FILTER_TYPE.ASCENDING) {
         $('#resetButton').prop('disabled', false);
@@ -63,6 +61,10 @@ const tableSlice = createSlice({
     updateCurrentRows: (state, action: PayloadAction<Country[]>) => {
       state.currentRows = action.payload;
     },
+    addAllRowsToCurrent: (state) => {
+      state.currentRows = state.rows;
+      state.currentRowCount = state.totalRows;
+    },
   },
 });
 
@@ -74,4 +76,5 @@ export const {
   addHeaders,
   addRowsToCurrent,
   updateCurrentRows,
+  addAllRowsToCurrent,
 } = tableSlice.actions;

@@ -4,7 +4,12 @@ import {
   addFilterOnClickListener,
   applyFilter,
 } from './utils';
-import { addRowsToCurrent, store, updateFilter } from './store';
+import {
+  addRowsToCurrent,
+  store,
+  updateFilter,
+  addAllRowsToCurrent,
+} from './store';
 
 type JQueryScrollEvent = JQuery.ScrollEvent<
   HTMLElement,
@@ -140,7 +145,7 @@ function createResetFilterButton() {
 
 function createLoadMoreButton() {
   const loadMoreButton = $('<button>', {
-    class: 'btn btn-secondary',
+    class: 'btn btn-secondary me-3',
     id: 'loadMoreButton',
     type: 'button',
   })
@@ -150,11 +155,30 @@ function createLoadMoreButton() {
   return loadMoreButton;
 }
 
+function createLoadAllRowsButton() {
+  const loadMoreButton = $('<button>', {
+    class: 'btn btn-secondary',
+    id: 'loadMoreButton',
+    type: 'button',
+  })
+    .text('Load all rows')
+    .on('click', () => {
+      store.dispatch(addAllRowsToCurrent());
+      applyFilter();
+    });
+
+  return loadMoreButton;
+}
+
 export function addTableButtons() {
   const resetButton = createResetFilterButton();
   const loadMoreButton = createLoadMoreButton();
+  const loadAllRowsButton = createLoadAllRowsButton();
 
-  $('#tableContainer').append(resetButton).append(loadMoreButton);
+  $('#tableContainer')
+    .append(resetButton)
+    .append(loadMoreButton)
+    .append(loadAllRowsButton);
 }
 
 export function createTable() {
