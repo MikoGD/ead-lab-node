@@ -19,6 +19,14 @@ This is to compile and bundle the javascript files for the client javascript bun
 
 Run `start_client` script
 
+### Build
+
+To build the whole project, client and server.
+
+Run `build`
+
 ### Run server
+
+First start dev scripts `start_server` and `start_client` or build the project with `build` before running the server.
 
 Run `run_server` script
