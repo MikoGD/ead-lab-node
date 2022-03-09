@@ -23,5 +23,32 @@
 }
 
 .remove {
-  display: none;
+  display: none !important;
+}
+
+#modalContainer {
+  align-items: center;
+  justify-content: center;
+  display: flex;
+}
+
+#closeModalButton {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+#modal {
+  height: 50%;
+  width: 75%;
+}
+
+#modalBody {
+  height: 100%;
+  width: 100%;
+}
+
+#modalSquare {
+  height: 5rem;
+  width: 5rem;
 }

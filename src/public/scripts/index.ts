@@ -2,6 +2,7 @@ import '../styles/index.css';
 import { Country, FILTER_TYPE } from './types';
 import { addTableButtons, createTable } from './table';
 import { addRowsToStore, store, addHeaders, updateFilter } from './store';
+import { openModal, setupModalButtons } from './modal';
 
 function sendCountriesDataRequest() {
   const xhttp = new XMLHttpRequest();
@@ -63,6 +64,8 @@ function sendCountriesDataRequest() {
   xhttp.send();
 }
 
+$('#modalContainer').hide();
+
 $('#dataButton').on('click', (event) => {
   $('.spinner-border').removeClass('invisible');
 
@@ -80,3 +83,9 @@ $('#dataButton').on('click', (event) => {
 
   $(event.target).addClass('remove');
 });
+
+$('#modalButton').on('click', () => {
+  openModal();
+});
+
+setupModalButtons();
