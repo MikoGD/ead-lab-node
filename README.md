@@ -7,26 +7,10 @@ code. The data is data on countries to create a unique table from the 6 json fil
 must be requested through AJAX. jQuery is also a requirement for this lab. I used this lab to further my understanding
 of redux and webpack. The use of TypeScript, webpack and redux was not necessary.
 
-## How to start development
+## How to run the server
 
-### Server
-
-Run `start_server` script
-
-### Client
-
-This is to compile and bundle the javascript files for the client javascript bundel
-
-Run `start_client` script
-
-### Build
-
-To build the whole project, client and server.
-
-Run `build`
-
-### Run server
-
-First start dev scripts `start_server` and `start_client` or build the project with `build` before running the server.
-
-Run `run_server` script
+- Install Node.JS and NPM
+- Run `npm install` to install all dependencies
+- Run `npm run build` to build the project
+- Run `npm run run_server` to start the server
+- Navigate to localhost:3000 to open the web page
